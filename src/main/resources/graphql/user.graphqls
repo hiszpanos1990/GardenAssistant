@@ -1,0 +1,26 @@
+input RegisterRequest {
+    username: String!
+    email: String!
+    password: String!
+}
+
+input LoginRequest{
+    username : String!
+    password : String!
+}
+
+type AuthResponse {
+    accessToken: String!
+    refreshToken: String!
+}
+
+extend type Mutation {
+    register(input: RegisterRequest!): AuthResponse!
+    login(input: LoginRequest!): AuthResponse!
+    refreshToken(refreshToken: String!): AuthResponse!
+}
+
+extend type Query{
+    healthCheck : String!
+}
+

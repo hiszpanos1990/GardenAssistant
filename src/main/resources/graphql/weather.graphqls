@@ -1,0 +1,9 @@
+type Weather{
+    temperature_2m : Float!
+    wind_speed_10m : Float!
+    weather_code : Int!
+}
+
+extend type Query {
+    weather(latitude : String!, longitude : String!) : Weather!
+}

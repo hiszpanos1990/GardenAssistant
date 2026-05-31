@@ -1,0 +1,52 @@
+type Garden{
+    id : ID!
+    name : String!
+    description : String
+    location : String!
+    maxPlants : Int!
+    plants : [Plant!]!
+}
+
+type Plant {
+    id: ID!
+    name: String!
+    type: String!
+    status: String!
+}
+
+type Query{
+    myGardens(page : Int!, size : Int!): GardenPage!
+}
+
+type GardenPage{
+    content : [Garden!]!
+    totalElements : Int!
+    totalPages : Int!
+    currentPage : Int!
+}
+
+input CreateGardenRequest{
+    name : String!
+    description : String
+    location : String!
+    maxPlants : Int!
+}
+
+input CreatePlantRequest{
+    name : String!
+    type : String!
+}
+type PlantResponse{
+    id: ID!
+    name: String!
+    type: String!
+    status: String!
+}
+
+
+type Mutation{
+    createGarden(gardenRequest : CreateGardenRequest!) : Garden!
+    addPlant(gardenId : ID!, plantRequest : CreatePlantRequest!) : PlantResponse!
+    removePlant(plantId : ID!) : Boolean!
+    generateGardenReport : String
+}
