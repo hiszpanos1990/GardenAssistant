@@ -4,6 +4,12 @@ type Weather{
     weather_code : Int!
 }
 
+type Coordinates{
+    latitude : Float!
+    longitude : Float!
+}
+
 extend type Query {
     weather(latitude : String!, longitude : String!) : Weather!
+    coordinates(location : String!) : Coordinates!
 }

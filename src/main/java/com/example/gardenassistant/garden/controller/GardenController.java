@@ -1,10 +1,10 @@
 package com.example.gardenassistant.garden.controller;
 
-import com.example.gardenassistant.garden.dto.CreateGardenRequest;
-import com.example.gardenassistant.garden.dto.GardenPageResponse;
-import com.example.gardenassistant.garden.dto.GardenResponse;
+import com.example.gardenassistant.garden.dto.*;
 import com.example.gardenassistant.garden.service.GardenService;
 import com.example.gardenassistant.garden.service.ReportService;
+import com.example.gardenassistant.weather.GeoCodingClient;
+import com.example.gardenassistant.weather.WeatherClient;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +24,29 @@ public class GardenController {
     Logger log = LoggerFactory.getLogger(GardenController.class);
     private final GardenService gardenService;
     private final ReportService reportService;
+    private final GeoCodingClient geoCodingClient;
+    private final WeatherClient weatherClient;
 
     @QueryMapping
     public GardenPageResponse myGardens(@Argument int page, @Argument int size){
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         return gardenService.getUserGardens(userName,PageRequest.of(page, size));
+    }
+
+    @QueryMapping
+    public CurrentWeather checkWeatherForGarden(@Argument Long gardenId){
+        GardenResponse gardenById = gardenService.getGardenById(gardenId);
+        GeoLocationResponse coordinatesByLocation = geoCodingClient.getCoordinatesByLocation(gardenById.location());
+        Coordinates coordinates = coordinatesByLocation.results().getFirst();
+
+        return weatherClient.getWeather(String.valueOf(coordinates.latitude()),
+                String.valueOf(coordinates.longitude())).current();
+
+    }
+
+    @QueryMapping
+    public GardenRecommendation gardenRecommendation(@Argument Long gardenId){
+        return gardenService.gardenRecommendation(gardenId);
     }
 
     @MutationMapping

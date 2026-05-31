@@ -14,8 +14,16 @@ type Plant {
     status: String!
 }
 
+type GardenRecommendation{
+    type : String!
+    severity : String!
+    message : String
+}
+
 type Query{
     myGardens(page : Int!, size : Int!): GardenPage!
+    checkWeatherForGarden(gardenId : ID!) : Weather!
+    gardenRecommendation(gardenId : ID!) : GardenRecommendation!
 }
 
 type GardenPage{
@@ -42,7 +50,6 @@ type PlantResponse{
     type: String!
     status: String!
 }
-
 
 type Mutation{
     createGarden(gardenRequest : CreateGardenRequest!) : Garden!

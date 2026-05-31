@@ -19,4 +19,11 @@ public class WebClientConfig {
                 .baseUrl("https://api.open-meteo.com")
                 .build();
     }
+
+    @Bean
+    public WebClient geoCodingWebClient(WebClient.Builder builder) {
+        return builder
+                .baseUrl("https://geocoding-api.open-meteo.com/")
+                .build();
+    }
 }

@@ -5,13 +5,18 @@ import com.example.gardenassistant.garden.dto.WeatherResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
-@RequiredArgsConstructor
 public class WeatherClient {
+    @Qualifier("weatherWebClient")
     private final WebClient webClient;
+
+    public WeatherClient(@Qualifier("weatherWebClient") WebClient webClient){
+        this.webClient = webClient;
+    }
 
     @Retry(name = "weatherService", fallbackMethod = "fallbackWeather")
     @CircuitBreaker(name = "weatherService", fallbackMethod = "fallbackWeather")
