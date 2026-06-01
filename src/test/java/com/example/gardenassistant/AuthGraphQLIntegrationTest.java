@@ -1,9 +1,6 @@
 package com.example.gardenassistant;
 
-import com.example.gardenassistant.garden.entity.Garden;
-import com.example.gardenassistant.garden.entity.Plant;
-import com.example.gardenassistant.garden.entity.Roles;
-import com.example.gardenassistant.garden.entity.User;
+import com.example.gardenassistant.garden.entity.*;
 import com.example.gardenassistant.garden.repository.GardenRepository;
 import com.example.gardenassistant.garden.repository.PlantRepository;
 import com.example.gardenassistant.garden.repository.UserRepository;
@@ -210,7 +207,7 @@ public class AuthGraphQLIntegrationTest {
 
         Plant plant = new Plant();
         plant.setName("Tomato");
-        plant.setType("Vegetable");
+        plant.setProfile(new PlantProfile());
         plant.setGarden(garden);
         plantRepository.save(plant);
 

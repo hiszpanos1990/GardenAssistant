@@ -4,6 +4,7 @@ import com.example.gardenassistant.garden.entity.Plant;
 import com.example.gardenassistant.garden.entity.PlantStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +16,6 @@ public interface PlantRepository extends JpaRepository<Plant, Long> {
     List<Plant> findByStatus(PlantStatus status);
     long countByGardenId(Long gardenId);
     List<Plant> findByGardenId(Long gardenId);
+    @EntityGraph(attributePaths = {"profile", "garden"})
     List<Plant> findByGardenIdIn(List<Long> gardenIds);
 }

@@ -18,7 +18,10 @@ public class Plant {
     private Long id;
 
     private String name;
-    private String type;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "plant_profile_id")
+    private PlantProfile profile;
+
     private LocalDateTime plantedDate;
 
     @Enumerated(EnumType.STRING)
@@ -31,4 +34,6 @@ public class Plant {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "garden_id")
     private Garden garden;
+
+    private LocalDateTime lastWateredDate;
 }

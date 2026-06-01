@@ -46,7 +46,7 @@ public class PlantServiceTest {
         when(gardenRepository.findById(1L)).thenReturn(Optional.of(garden));
         when(plantRepository.countByGardenId(1L)).thenReturn(2L);
 
-        assertThrows(GardenFullException.class,()-> plantService.addPlantToGarden(1L, new CreatePlantRequest("test","test", "test")));
+        assertThrows(GardenFullException.class,()-> plantService.addPlantToGarden(1L, new CreatePlantRequest("test",1L, "test")));
 
         verify(gardenRepository).findById(1L);
 
@@ -68,7 +68,7 @@ public class PlantServiceTest {
         CreatePlantRequest request =
                 new CreatePlantRequest(
                         "Tomato",
-                        "Vegetable",
+                        1L,
                         "HEALTHY"
                 );
 
@@ -92,7 +92,7 @@ public class PlantServiceTest {
         Plant savedPlant = plantArgumentCaptor.getValue();
 
         assertEquals("Tomato", savedPlant.getName());
-        assertEquals("Vegetable", savedPlant.getType());
+        assertEquals(1L, savedPlant.getProfile().getId());
         assertEquals(garden, savedPlant.getGarden());
     }
 }

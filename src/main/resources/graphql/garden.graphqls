@@ -10,8 +10,17 @@ type Garden{
 type Plant {
     id: ID!
     name: String!
-    type: String!
+    plantProfile: PlantProfile
     status: String!
+}
+
+type PlantProfile{
+    id : ID!
+    name : String!
+    wateringFrequencyDays : Int
+    minTemperature : Float
+    maxTemperature : Float
+    likesRain : Boolean
 }
 
 type GardenRecommendation{
@@ -20,10 +29,20 @@ type GardenRecommendation{
     message : String
 }
 
+type PlantRecommendation{
+    plantId: ID!
+    plantName: String!
+    type: String!
+    severity: String!
+    message: String!
+}
+
 type Query{
     myGardens(page : Int!, size : Int!): GardenPage!
     checkWeatherForGarden(gardenId : ID!) : Weather!
     gardenRecommendation(gardenId : ID!) : GardenRecommendation!
+    plantProfiles: [PlantProfile!]!
+    getPlantRecommendations(gardenId : ID!) : [PlantRecommendation!]!
 }
 
 type GardenPage{
@@ -42,18 +61,20 @@ input CreateGardenRequest{
 
 input CreatePlantRequest{
     name : String!
-    type : String!
+    plantProfileId: ID!
 }
 type PlantResponse{
     id: ID!
     name: String!
-    type: String!
+    plantProfile: PlantProfile
     status: String!
 }
+
 
 type Mutation{
     createGarden(gardenRequest : CreateGardenRequest!) : Garden!
     addPlant(gardenId : ID!, plantRequest : CreatePlantRequest!) : PlantResponse!
     removePlant(plantId : ID!) : Boolean!
     generateGardenReport : String
+    waterPlant(plantId: ID!): Boolean!
 }

@@ -3,9 +3,8 @@ package com.example.gardenassistant.garden.controller;
 import com.example.gardenassistant.garden.dto.*;
 import com.example.gardenassistant.garden.service.GardenRecommendationService;
 import com.example.gardenassistant.garden.service.GardenService;
+import com.example.gardenassistant.garden.service.GardenWeatherService;
 import com.example.gardenassistant.garden.service.ReportService;
-import com.example.gardenassistant.weather.GeoCodingClient;
-import com.example.gardenassistant.weather.WeatherClient;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -24,8 +24,7 @@ public class GardenController {
     Logger log = LoggerFactory.getLogger(GardenController.class);
     private final GardenService gardenService;
     private final ReportService reportService;
-    private final GeoCodingClient geoCodingClient;
-    private final WeatherClient weatherClient;
+    private final GardenWeatherService gardenWeatherService;
     private final GardenRecommendationService gardenRecommendationService;
 
     @QueryMapping
@@ -36,13 +35,7 @@ public class GardenController {
 
     @QueryMapping
     public CurrentWeather checkWeatherForGarden(@Argument Long gardenId){
-        GardenResponse gardenById = gardenService.getGardenById(gardenId);
-        GeoLocationResponse coordinatesByLocation = geoCodingClient.getCoordinatesByLocation(gardenById.location());
-        Coordinates coordinates = coordinatesByLocation.results().getFirst();
-
-        return weatherClient.getWeather(String.valueOf(coordinates.latitude()),
-                String.valueOf(coordinates.longitude())).current();
-
+       return gardenWeatherService.getWeatherForGarden(gardenId);
     }
 
     @QueryMapping
@@ -66,5 +59,10 @@ public class GardenController {
 
         future.thenAccept(result -> log.info("Report generation result: {}", result));
         return "Report generation started";
+    }
+
+    @QueryMapping
+    List<PlantRecommendation> getPlantRecommendations(@Argument Long gardenId){
+        return gardenService.getPlantRecommendations(gardenId);
     }
 }

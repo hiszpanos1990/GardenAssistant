@@ -5,10 +5,13 @@ import com.example.gardenassistant.garden.dto.WeatherResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 @Service
 public class WeatherClient {
     @Qualifier("weatherWebClient")
@@ -18,9 +21,11 @@ public class WeatherClient {
         this.webClient = webClient;
     }
 
+    @Cacheable(value = "weather" , key = "#latitude +':'+ #longitude")
     @Retry(name = "weatherService", fallbackMethod = "fallbackWeather")
     @CircuitBreaker(name = "weatherService", fallbackMethod = "fallbackWeather")
     public WeatherResponse getWeather(String latitude, String longitude) {
+        log.info("Calling OpenMeteo API...");
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/forecast")

@@ -4,11 +4,14 @@ import com.example.gardenassistant.exception.GardenFullException;
 import com.example.gardenassistant.exception.GardenNotFoundException;
 import com.example.gardenassistant.garden.dto.CreatePlantRequest;
 import com.example.gardenassistant.garden.dto.GardenResponse;
+import com.example.gardenassistant.garden.dto.PlantProfileResponse;
 import com.example.gardenassistant.garden.dto.PlantResponse;
 import com.example.gardenassistant.garden.entity.*;
 import com.example.gardenassistant.garden.repository.GardenRepository;
+import com.example.gardenassistant.garden.repository.PlantProfileRepository;
 import com.example.gardenassistant.garden.repository.PlantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,8 @@ public class PlantService {
     private final GardenRepository gardenRepository;
     private final PlantRepository plantRepository;
     private final CurrentUserService currentUserService;
+    private final PlantProfileRepository plantProfileRepository;
+
 
     @Transactional
     public PlantResponse addPlantToGarden(Long gardenId, CreatePlantRequest plantRequest){
@@ -32,19 +37,27 @@ public class PlantService {
         if(currentPlantsSize >= garden.getMaxPlants()){
             throw new GardenFullException("Garden is full");
         }
+
+        PlantProfile plantProfile = plantProfileRepository.findById(plantRequest.plantProfileId())
+                .orElseThrow(()-> new GardenNotFoundException("Plant profile not found"));
+
+        PlantProfileResponse plantProfileResponse =
+                new PlantProfileResponse(plantProfile);
+
+
         Plant plant = new Plant();
         plant.setName(plantRequest.name());
         plant.setGarden(garden);
-        plant.setType(plantRequest.type());
+        plant.setProfile(plantProfile);
         plant.setPlantedDate(LocalDateTime.now());
         plant.setStatus(PlantStatus.HEALTHY);
 
 
         Plant savedPlant = plantRepository.save(plant);
 
-        return new PlantResponse(savedPlant.getId(), savedPlant.getName(), savedPlant.getType(), savedPlant.getStatus().name());
+        return new PlantResponse(savedPlant.getId(), savedPlant.getName(), plantProfileResponse, savedPlant.getStatus().name());
     }
-
+    @Transactional(readOnly = true)
     public Map<GardenResponse, List<PlantResponse>> getPlantsForGardens(List<GardenResponse> gardens) {
         List<Long> gardenIds = gardens.stream()
                 .map(GardenResponse::id)
@@ -57,7 +70,7 @@ public class PlantService {
                         .groupingBy(plant -> plant.getGarden().getId(),
                                 Collectors.mapping(plant ->
                                         new PlantResponse(plant.getId(), plant.getName(),
-                                                plant.getType(), plant.getStatus().name()),
+                                                new PlantProfileResponse(plant.getProfile()), plant.getStatus().name()),
                                         Collectors.toList())
         ));
 
@@ -82,6 +95,13 @@ public class PlantService {
         }
 
         plantRepository.deleteById(plantId);
+        return true;
+    }
+
+    @Transactional
+    public Boolean waterPlant(Long plantId) {
+        Plant plant = plantRepository.findById(plantId).orElseThrow(() -> new GardenNotFoundException("Plant not found"));
+        plant.setLastWateredDate(LocalDateTime.now());
         return true;
     }
 }

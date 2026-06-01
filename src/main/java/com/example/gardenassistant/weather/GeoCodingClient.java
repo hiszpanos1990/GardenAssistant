@@ -6,6 +6,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,6 +22,7 @@ public class GeoCodingClient {
         this.webClient = webClient;
     }
 
+    @Cacheable(value = "geoCoding" , key = "#location.toLowerCase()")
     @Retry(name = "geoCodingService" , fallbackMethod = "geoCodingFallback")
     @CircuitBreaker(name = "geoCodingService" , fallbackMethod = "geoCodingFallback")
     public GeoLocationResponse getCoordinatesByLocation(String location){
