@@ -1,6 +1,7 @@
 package com.example.gardenassistant.garden.controller;
 
 import com.example.gardenassistant.garden.dto.*;
+import com.example.gardenassistant.garden.service.GardenRecommendationService;
 import com.example.gardenassistant.garden.service.GardenService;
 import com.example.gardenassistant.garden.service.ReportService;
 import com.example.gardenassistant.weather.GeoCodingClient;
@@ -8,7 +9,6 @@ import com.example.gardenassistant.weather.WeatherClient;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -26,6 +26,7 @@ public class GardenController {
     private final ReportService reportService;
     private final GeoCodingClient geoCodingClient;
     private final WeatherClient weatherClient;
+    private final GardenRecommendationService gardenRecommendationService;
 
     @QueryMapping
     public GardenPageResponse myGardens(@Argument int page, @Argument int size){
@@ -46,7 +47,7 @@ public class GardenController {
 
     @QueryMapping
     public GardenRecommendation gardenRecommendation(@Argument Long gardenId){
-        return gardenService.gardenRecommendation(gardenId);
+        return gardenRecommendationService.gardenRecommendation(gardenId);
     }
 
     @MutationMapping
