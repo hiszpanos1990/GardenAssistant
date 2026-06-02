@@ -59,4 +59,9 @@ public class GardenController {
         future.thenAccept(result -> log.info("Report generation result: {}", result));
         return "Report generation started";
     }
+
+    @MutationMapping
+    public Boolean waterGarden(@Argument Long gardenId){
+        return gardenService.waterGarden(gardenId);
+    }
 }

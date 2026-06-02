@@ -26,7 +26,7 @@ public class PlantService {
     private final PlantRepository plantRepository;
     private final CurrentUserService currentUserService;
     private final PlantProfileRepository plantProfileRepository;
-
+    private final GardenActivityService gardenActivityService;
 
     @Transactional
     public PlantResponse addPlantToGarden(Long gardenId, CreatePlantRequest plantRequest){
@@ -105,10 +105,14 @@ public class PlantService {
     public Boolean waterPlant(Long plantId) {
         User currentUser = currentUserService.getCurrentUser();
         Plant plant = plantRepository.findById(plantId).orElseThrow(() -> new GardenNotFoundException("Plant not found"));
-        if (!plant.getGarden().getUser().getId().equals(currentUser.getId())) {
+        Garden garden = plant.getGarden();
+        if (!garden.getUser().getId().equals(currentUser.getId())) {
             throw new RuntimeException("You are not allowed to water this plant");
         }
         plant.setLastWateredDate(LocalDateTime.now());
+
+        gardenActivityService.recordPlantWatered(garden.getId(),plantId,plant.getName());
+
         return true;
     }
 }

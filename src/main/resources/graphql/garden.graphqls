@@ -77,4 +77,5 @@ type Mutation{
     removePlant(plantId : ID!) : Boolean!
     generateGardenReport : String
     waterPlant(plantId: ID!): Boolean!
+    waterGarden(gardenId: ID!): Boolean!
 }

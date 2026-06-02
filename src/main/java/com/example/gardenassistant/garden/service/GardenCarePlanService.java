@@ -1,9 +1,7 @@
 package com.example.gardenassistant.garden.service;
 
-import com.example.gardenassistant.garden.dto.GardenCarePlan;
-import com.example.gardenassistant.garden.dto.GardenRecommendation;
-import com.example.gardenassistant.garden.dto.GardenResponse;
-import com.example.gardenassistant.garden.dto.PlantRecommendation;
+import com.example.gardenassistant.garden.dto.*;
+import com.example.gardenassistant.garden.entity.GardenActivity;
 import com.example.gardenassistant.garden.entity.RecommendationLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +16,7 @@ public class GardenCarePlanService {
     private final GardenService gardenService;
     private final GardenRecommendationService gardenRecommendationService;
     private final PlantRecommendationService plantRecommendationService;
+    private final GardenActivityService gardenActivityService;
 
 
     public GardenCarePlan getGardenCarePlan(Long gardenId){
@@ -35,8 +34,11 @@ public class GardenCarePlanService {
                 criticalCount
         );
 
-        return new GardenCarePlan(gardenId,gardenById.name(),overallStatus,gardenRecommendation,plantRecommendation
-        ,plantRecommendation.size(),warningsCount, criticalCount);
+        List<GardenActivityResponse> recentActivities = gardenActivityService.getGardenActivities(gardenId);
+
+        return new GardenCarePlan(gardenId,gardenById.name(),overallStatus,
+                gardenById.lastWateredDate(),gardenRecommendation,plantRecommendation
+        ,plantRecommendation.size(),warningsCount, criticalCount, recentActivities);
     }
 
     private long countBySeverity(List <PlantRecommendation> plantRecommendation, RecommendationLevel level){

@@ -1,0 +1,13 @@
+type GardenActivityResponse{
+    id : ID!
+    gardenId : Int
+    plantId : Int
+    plantName : String
+    type : String
+    message : String
+    createdAt : String
+}
+
+extend type Query{
+    getGardenActivities(gardenId : ID!) : [GardenActivityResponse!]!
+}

@@ -1,6 +1,7 @@
 package com.example.gardenassistant.garden.service;
 
 import com.example.gardenassistant.event.GardenCreatedEvent;
+import com.example.gardenassistant.exception.GardenNotFoundException;
 import com.example.gardenassistant.garden.dto.CreateGardenRequest;
 import com.example.gardenassistant.garden.dto.GardenPageResponse;
 import com.example.gardenassistant.garden.dto.GardenResponse;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class GardenService {
     private final GardenRepository gardenRepository;
     private final CurrentUserService currentUserService;
     private final ApplicationEventPublisher publisher;
+    private final GardenActivityService gardenActivityService;
 
     @CacheEvict(value = "myGardens" , allEntries = true)
     @Transactional
@@ -46,7 +49,7 @@ public class GardenService {
                 new GardenCreatedEvent(save.getId(), save.getName())
         );
 
-        return new GardenResponse(save.getId(), save.getName(), save.getDescription(), save.getLocation(), save.getMaxPlants());
+        return new GardenResponse(save.getId(), save.getName(), save.getDescription(), save.getLocation(), save.getLastWateredDate(), save.getMaxPlants());
     }
 
     @Cacheable(
@@ -59,7 +62,7 @@ public class GardenService {
 
         List<GardenResponse> content = gardens.stream()
                 .map(garden -> new GardenResponse(garden.getId(),
-                        garden.getName(), garden.getDescription(), garden.getLocation(), garden.getMaxPlants()))
+                        garden.getName(), garden.getDescription(), garden.getLocation(), garden.getLastWateredDate(),garden.getMaxPlants()))
                 .toList();
 
 
@@ -73,7 +76,8 @@ public class GardenService {
 
     public GardenResponse getGardenById(Long gardenId){
         User currentUser = currentUserService.getCurrentUser();
-        Garden garden = gardenRepository.findById(gardenId).orElseThrow();
+        Garden garden = gardenRepository.findById(gardenId)
+                .orElseThrow(()-> new GardenNotFoundException("Garden not found"));
 
         if(!garden.getUser().getId().equals(currentUser.getId())){
             throw new RuntimeException("You are not allowed to access this garden");
@@ -84,7 +88,18 @@ public class GardenService {
                 garden.getName(),
                 garden.getDescription(),
                 garden.getLocation(),
+                garden.getLastWateredDate(),
                 garden.getMaxPlants()
         );
+    }
+
+    @Transactional
+    public Boolean waterGarden(Long gardenId) {
+        Garden garden = gardenRepository.findById(gardenId).orElseThrow(() -> new GardenNotFoundException("Garden not found"));
+        garden.setLastWateredDate(LocalDateTime.now());
+
+        gardenActivityService.recordGardenWatered(gardenId);
+
+        return true;
     }
 }

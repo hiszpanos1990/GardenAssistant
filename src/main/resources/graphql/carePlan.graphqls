@@ -2,11 +2,13 @@ type GardenCarePlan{
     gardenId : ID!
     gardenName : String
     overallStatus : String
+    gardenLastWateredDate: String
     gardenRecommendation : GardenRecommendation
     plantsRecommendation : [PlantRecommendation]
     plantsCount : Int
     warningsCount : Int
     criticalCount : Int
+    recentActivities : [GardenActivityResponse]
 }
 
 extend type Query{

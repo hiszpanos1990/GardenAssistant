@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -36,10 +39,10 @@ public class GardenRecommendationService {
         CurrentWeather current = weatherClient.getWeather(String.valueOf(coordinates.latitude()),
                 String.valueOf(coordinates.longitude())).current();
 
-        return getWeatherRecommendation(current);
+        return getWeatherRecommendation(current, gardenById.lastWateredDate());
     }
 
-    private GardenRecommendation getWeatherRecommendation(CurrentWeather weather){
+    private GardenRecommendation getWeatherRecommendation(CurrentWeather weather, LocalDateTime lastWateredDate){
         WeatherCondition condition = WeatherConditionMapper.map(weather.weather_code());
         if (condition == WeatherCondition.RAIN
                 || condition == WeatherCondition.RAIN_SHOWERS
@@ -50,11 +53,30 @@ public class GardenRecommendationService {
                     "Nie podlewaj ogrodu. Prognozowane są opady."
             );
         }
-        if (weather.temperature_2m() >= 28) {
+        if (lastWateredDate == null) {
+            return new GardenRecommendation(
+                    RecommendationType.WATERING.name(),
+                    RecommendationLevel.WARNING.name(),
+                    "Ogród nie był jeszcze oznaczony jako podlany. Sprawdź wilgotność gleby."
+            );
+        }
+
+        long daysSinceWatered = Duration.between(lastWateredDate, LocalDateTime.now()).toDays();
+
+
+        if (daysSinceWatered >= 3 && weather.temperature_2m() >= 28) {
             return new GardenRecommendation(
                     RecommendationType.HEAT.name(),
                     RecommendationLevel.WARNING.name(),
-                    "Jest gorąco. Podlej ogród wieczorem, nie w pełnym słońcu."
+                    "Ogród nie był podlewany od " + daysSinceWatered + " dni i jest gorąco. Podlej wieczorem."
+            );
+        }
+
+        if (daysSinceWatered >= 3) {
+            return new GardenRecommendation(
+                    RecommendationType.WATERING.name(),
+                    RecommendationLevel.WARNING.name(),
+                    "Ogród nie był podlewany od " + daysSinceWatered + " dni. Rozważ podlewanie."
             );
         }
 
@@ -69,7 +91,7 @@ public class GardenRecommendationService {
         return new GardenRecommendation(
                 RecommendationType.WATERING.name(),
                 RecommendationLevel.INFO.name(),
-                "Brak opadów. Sprawdź wilgotność gleby i rozważ podlewanie."
+                "Ogród był niedawno podlewany. Sprawdź wilgotność gleby przed kolejnym podlewaniem."
         );
     }
 }
