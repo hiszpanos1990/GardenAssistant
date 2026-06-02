@@ -15,6 +15,7 @@ public interface PlantRepository extends JpaRepository<Plant, Long> {
     Page<Plant> findByGardenId(Long gardenId, Pageable pageable);
     List<Plant> findByStatus(PlantStatus status);
     long countByGardenId(Long gardenId);
+    @EntityGraph(attributePaths = {"profile", "garden", "garden.user"})
     List<Plant> findByGardenId(Long gardenId);
     @EntityGraph(attributePaths = {"profile", "garden"})
     List<Plant> findByGardenIdIn(List<Long> gardenIds);

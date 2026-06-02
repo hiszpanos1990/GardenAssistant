@@ -11,8 +11,6 @@ import com.example.gardenassistant.garden.repository.GardenRepository;
 import com.example.gardenassistant.garden.repository.PlantProfileRepository;
 import com.example.gardenassistant.garden.repository.PlantRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,12 @@ public class PlantService {
 
     @Transactional
     public PlantResponse addPlantToGarden(Long gardenId, CreatePlantRequest plantRequest){
+        User currentUser = currentUserService.getCurrentUser();
         Garden garden = gardenRepository.findById(gardenId).orElseThrow(()-> new GardenNotFoundException("Garden not found"));
+        if (currentUser.getId() != garden.getUser().getId()){
+            throw new RuntimeException("You are not allowed to add plants to this garden");
+        }
+
         long currentPlantsSize = plantRepository.countByGardenId(gardenId);
         if(currentPlantsSize >= garden.getMaxPlants()){
             throw new GardenFullException("Garden is full");
@@ -100,7 +103,11 @@ public class PlantService {
 
     @Transactional
     public Boolean waterPlant(Long plantId) {
+        User currentUser = currentUserService.getCurrentUser();
         Plant plant = plantRepository.findById(plantId).orElseThrow(() -> new GardenNotFoundException("Plant not found"));
+        if (!plant.getGarden().getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You are not allowed to water this plant");
+        }
         plant.setLastWateredDate(LocalDateTime.now());
         return true;
     }

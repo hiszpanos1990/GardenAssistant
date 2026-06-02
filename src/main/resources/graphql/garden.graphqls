@@ -42,7 +42,7 @@ type Query{
     checkWeatherForGarden(gardenId : ID!) : Weather!
     gardenRecommendation(gardenId : ID!) : GardenRecommendation!
     plantProfiles: [PlantProfile!]!
-    getPlantRecommendations(gardenId : ID!) : [PlantRecommendation!]!
+    getPlantRecommendation(gardenId : ID!) : [PlantRecommendation!]!
 }
 
 type GardenPage{

@@ -15,7 +15,6 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -59,10 +58,5 @@ public class GardenController {
 
         future.thenAccept(result -> log.info("Report generation result: {}", result));
         return "Report generation started";
-    }
-
-    @QueryMapping
-    List<PlantRecommendation> getPlantRecommendations(@Argument Long gardenId){
-        return gardenService.getPlantRecommendations(gardenId);
     }
 }

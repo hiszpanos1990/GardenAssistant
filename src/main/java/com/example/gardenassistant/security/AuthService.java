@@ -2,7 +2,6 @@ package com.example.gardenassistant.security;
 
 import com.example.gardenassistant.exception.AlreadyExistException;
 import com.example.gardenassistant.exception.InvalidCredentialException;
-import com.example.gardenassistant.exception.UserNotFoundException;
 import com.example.gardenassistant.garden.dto.AuthResponse;
 import com.example.gardenassistant.garden.dto.LoginRequest;
 import com.example.gardenassistant.garden.dto.RegisterRequest;

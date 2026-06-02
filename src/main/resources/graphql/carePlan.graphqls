@@ -1,0 +1,14 @@
+type GardenCarePlan{
+    gardenId : ID!
+    gardenName : String
+    overallStatus : String
+    gardenRecommendation : GardenRecommendation
+    plantsRecommendation : [PlantRecommendation]
+    plantsCount : Int
+    warningsCount : Int
+    criticalCount : Int
+}
+
+extend type Query{
+    getGardenCarePlan(gardenId : ID!) : GardenCarePlan!
+}

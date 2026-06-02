@@ -1,7 +1,6 @@
 package com.example.gardenassistant.garden.mapper;
 
 import com.example.gardenassistant.garden.entity.WeatherCondition;
-import org.springframework.stereotype.Component;
 
 public class WeatherConditionMapper {
     public static WeatherCondition map(int code) {

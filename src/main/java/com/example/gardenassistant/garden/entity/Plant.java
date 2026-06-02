@@ -18,7 +18,7 @@ public class Plant {
     private Long id;
 
     private String name;
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plant_profile_id")
     private PlantProfile profile;
 

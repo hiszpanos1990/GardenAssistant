@@ -45,7 +45,7 @@ public class PlantController {
     }
 
     @MutationMapping
-    public Boolean waterPlant(Long plantId){
+    public Boolean waterPlant(@Argument Long plantId){
         return plantService.waterPlant(plantId);
     }
 }

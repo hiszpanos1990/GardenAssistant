@@ -4,7 +4,6 @@ import com.example.gardenassistant.garden.dto.Coordinates;
 import com.example.gardenassistant.garden.dto.GeoLocationResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
